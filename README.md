@@ -1,2 +1,2 @@
-# Anichinu
-Chrome Extension to instantly open your anime site 
+# Anichinu 
+Watching Anime & Waifu made easier. : https://chrome.google.com/webstore/detail/anichinu/bempahanfbelceikgbhicebchefdlpog
