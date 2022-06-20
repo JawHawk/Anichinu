@@ -1,0 +1,123 @@
+body {
+  width: 420px;
+  height: 210px;
+  padding: 20px 50px;
+}
+
+.flexRow {
+  display: flex;
+  flex-direction: row;
+}
+
+.toggle_button {
+  display: flex;
+  background-color: #ebe8e8;
+  height: 35px;
+  padding: 0.45rem;
+  gap: 0.6rem;
+  border-radius: 5rem;
+  margin: 0.6rem 0rem;
+  max-width: 250px;
+}
+
+.toggle-animation-r {
+  background: linear-gradient(to left, white 50%, rgb(12, 69, 107) 50%) right;
+  background-size: 200%;
+  transition: 0.4s ease-out;
+}
+
+.toggle-animation-l {
+  background: linear-gradient(to right, white 50%, rgb(12, 69, 107) 50%) left;
+  background-size: 200%;
+  transition: 0.4s ease-out;
+}
+
+button {
+  padding: 0.5rem 0.9rem;
+  border: none;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+  border-radius: 5rem;
+  cursor: pointer;
+  color: white;
+}
+
+.main {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.main .logo {
+  flex: 1 1 0;
+  width: 125px;
+  height: 80px;
+  z-index: 1;
+  position: relative;
+  transform: scale(1.4);
+  right: 35px;
+}
+.main .sub {
+  flex: 2 1 0;
+  display: flex;
+  height: 200px;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: flex-start;
+}
+.main .sub p {
+  font-size: 1.3em;
+  font-weight: bold;
+  width: 97px;
+  height: 35px;
+  text-align: center;
+  padding-top: 5px;
+  font-style: italic;
+  color: rgb(12, 69, 107);
+}
+.main .sub .background, .main .sub .choice, .main .sub .site {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  gap: 40px;
+}
+
+.line {
+  width: 95px;
+  height: 70px;
+  border-top: 1px solid rgb(12, 69, 107);
+  border-bottom: 1px solid rgb(12, 69, 107);
+  position: absolute;
+  top: 85px;
+  left: 162px;
+}
+
+.semicircle {
+  width: 300px;
+  position: absolute;
+  top: -20px;
+  left: -130px;
+  height: 320px;
+  border-radius: 50%;
+  background: rgb(12, 69, 107);
+  border: 1px solid rgb(12, 69, 107);
+}
+
+.lock_nsfw {
+  position: absolute;
+  bottom: 20px;
+  right: 30px;
+  border-radius: 3px;
+  z-index: 10;
+  display: none;
+}
+.lock_nsfw input {
+  width: 100px;
+}
+.lock_nsfw button {
+  width: 55px;
+  height: 30px;
+  color: white;
+  font-size: 1em;
+  padding: 0;
+  background: rgb(12, 69, 107);
+}/*# sourceMappingURL=style.css.map */

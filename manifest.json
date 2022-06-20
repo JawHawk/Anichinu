@@ -1,0 +1,25 @@
+{"manifest_version": 3, "name" : "Anichinu", "description" : "Watching anime & Waifu made easier", "version": "1.21", "author" : "Chinmay Joshi",
+    "background": {
+        "service_worker": "background.js"
+      },
+      "chrome_url_overrides" : {
+        "newtab": "newtab.html"
+      },
+      "action": {
+          "default_popup":"popup.html",
+          "default_icon": {
+            "16": "/images/girl2.png",
+            "32": "/images/girl2.png",
+            "48": "/images/girl2.png",
+            "128": "/images/girl2.png"
+          }
+      },
+    "permissions": ["tabs","storage"],
+
+      "icons": {
+        "16": "/images/girl2.png",
+        "32": "/images/girl2.png",
+        "48": "/images/girl2.png",
+        "128": "/images/girl2.png"
+      }
+}
