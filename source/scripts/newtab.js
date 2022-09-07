@@ -19,11 +19,11 @@ add3 = document.querySelector('#add3')
 dropdown = document.querySelector('#dropdown')
 
 let animeList,zoroList;
-fetch("./AnimeList.json").then(res => res.json()).then(data => animeList = data)
-fetch("./zoroList.json").then(res=>res.json()).then(data=>zoroList = data.zoroList)
+fetch("../anime_data/AnimeList.json").then(res => res.json()).then(data => animeList = data)
+fetch("../anime_data/zoroList.json").then(res=>res.json()).then(data=>zoroList = data.zoroList)
 
 
-  
+
 // theme
   if(localStorage.bg == "black"){
     document.body.style.background = "black"
@@ -42,7 +42,7 @@ fetch("./zoroList.json").then(res=>res.json()).then(data=>zoroList = data.zoroLi
     // anime_name.classList.add('.dark-theme')
     // anime_name.classList.remove('.dark-theme')
   }
- 
+
 //========//
 function category_changer(){
   sfw_categories = ["uniform","maid","waifu","oppai","marin-kitagawa","mori-calliope","raiden-shogun","selfies"]
@@ -65,7 +65,7 @@ category_changer();
 document.querySelector('#option0').innerHTML = localStorage.category;
 dropdown.addEventListener('change',()=>{
 let s;
-s = dropdown.options[dropdown.selectedIndex].text; 
+s = dropdown.options[dropdown.selectedIndex].text;
 localStorage.category = s
 chrome.tabs.reload()
 })
@@ -84,7 +84,7 @@ chrome.tabs.reload()
    const getUrl = async () => {
     const res = await fetch(`https://api.waifu.im/random/?selected_tags=${localStorage.category}&is_nsfw=true`)
     const json = await res.json();
-    
+
     document.querySelector("#bg").src = json.images[0].url;
   };
    getUrl();
@@ -97,10 +97,10 @@ chrome.tabs.reload()
     }
    //   const response = await fetch("https://api.waifu.pics/sfw/waifu");
    //   const json = await response.json();
-   //  document.querySelector("#bg").src = json.url; 
+   //  document.querySelector("#bg").src = json.url;
    const res = await fetch(`https://api.waifu.im/random/?selected_tags=${localStorage.category}&is_nsfw=false`)
      const json = await res.json();
-    document.querySelector("#bg").src = json.images[0].url; 
+    document.querySelector("#bg").src = json.images[0].url;
   };
    getUrl();
   }
@@ -112,7 +112,7 @@ anime.addEventListener('keyup',()=>{
   // let final_list = []
   // document.querySelector('.suggestion').style.display = "block"
   if(localStorage.site == "gogo"){
-    let filteredList = animeList.AnimeList.filter(item => 
+    let filteredList = animeList.AnimeList.filter(item =>
       item.includes(anime.value))
     var i = 0
     const suggs = document.querySelectorAll('.sugg')
@@ -121,7 +121,7 @@ anime.addEventListener('keyup',()=>{
       if(element.innerHTML == "undefined"){
         element.style.display = "none"
       } else { element.style.display = "block"}
-      i++; 
+      i++;
      })
 
   } else {
@@ -133,16 +133,16 @@ anime.addEventListener('keyup',()=>{
        if(element.innerHTML == "undefined"){
         element.style.display = "none"
       } else { element.style.display = "block"}
-       i++; 
+       i++;
       })
   }
 })
 
-//keyboard suggestions and bg 
+//keyboard suggestions and bg
 var i = 0;
 
 anime.addEventListener('keydown',(event)=>{
-  
+
   const suggs = document.querySelectorAll('.sugg')
 suggs.forEach(element =>{
   element.addEventListener('click',(e)=>{
@@ -169,11 +169,11 @@ suggs.forEach(element =>{
   //up
   if(event.which == "38"){
     if(i==1){i=5}
-    i--; 
+    i--;
     for(x=1;x<5;x++){  document.querySelector(`#sugg${x}`).style.background = "none";}
     document.querySelector(`#sugg${i}`).style.background = "rgb(150, 150, 255)";
   }
- 
+
   //enter
   if(event.which == "13"){
       sel_sugg = document.querySelector(`#sugg${i}`)
@@ -186,7 +186,7 @@ suggs.forEach(element =>{
 watch.addEventListener('click',click)
 
 function click(){
-    let anime_name = String(anime.value); 
+    let anime_name = String(anime.value);
     if (localStorage.site == "gogo") {
       if(anime_name == ""){
         chrome.tabs.update({ url: `https://gogoanime.gg` })
@@ -199,12 +199,12 @@ function click(){
         anime_name = anime_name.replaceAll('/','')
         anime_name = anime_name.replaceAll('---','-')
         anime_name = anime_name.replaceAll('--','-')
-    
+
         episode = String(ep.value)
         if (ep.value){
         chrome.tabs.update({ url: `https://gogoanime.wiki/${anime_name}-episode-${episode}` })
         } else{
-        chrome.tabs.update({ url: `https://gogoanime.wiki/category/${anime_name}` }) 
+        chrome.tabs.update({ url: `https://gogoanime.wiki/category/${anime_name}` })
          }
       }
     } else {
@@ -218,7 +218,7 @@ function click(){
       console.log(index)
       let link = zoroList[index].link
       console.log(link.slice(0,16) + "watch/" + link.slice(16))
-      chrome.tabs.update({ url: `${link.slice(0,16)}watch/${link.slice(16)}`})     
+      chrome.tabs.update({ url: `${link.slice(0,16)}watch/${link.slice(16)}`})
   }
 }
 
@@ -228,7 +228,7 @@ function click(){
 
 //add1 element
 if(localStorage.id1 == "changed"){
-  document.querySelector('.addimg1').src = `.//images/letter-${(localStorage.item_Name1.slice(0,1)).toLowerCase()}.png`
+  document.querySelector('.addimg1').src = `./assets/images/letter-${(localStorage.item_Name1.slice(0,1)).toLowerCase()}.png`
   document.querySelector('.txtnew1').innerHTML = `${localStorage.item_Name1}`
   document.querySelector('#parent-add1').style.marginTop = "-25px"
 
@@ -267,12 +267,12 @@ if(localStorage.id1 == "changed"){
    }
 })
  })
- 
+
 }
 
 //add2 element
 if(localStorage.id2 == "changed"){
-  document.querySelector('.addimg2').src = `.//images/letter-${(localStorage.item_Name2.slice(0,1)).toLowerCase()}.png`
+  document.querySelector('.addimg2').src = `./assets/images/letter-${(localStorage.item_Name2.slice(0,1)).toLowerCase()}.png`
   document.querySelector('.txtnew2').innerHTML = `${localStorage.item_Name2}`
   document.querySelector('#parent-add2').style.marginTop = "-25px"
 
@@ -309,15 +309,15 @@ if(localStorage.id2 == "changed"){
         alert("Enter Link name starting with an Alphabet.")
         chrome.tabs.reload()
        }
-      
+
     })
     })
-    
+
 }
 
-//add3 element 
+//add3 element
 if(localStorage.id3 == "changed"){
-  document.querySelector('.addimg3').src = `.//images/letter-${(localStorage.item_Name3.slice(0,1)).toLowerCase()}.png`
+  document.querySelector('.addimg3').src = `./assets/images/letter-${(localStorage.item_Name3.slice(0,1)).toLowerCase()}.png`
   document.querySelector('.txtnew3').innerHTML = `${localStorage.item_Name3}`
   document.querySelector('#parent-add3').style.marginTop = "-25px"
 
@@ -326,7 +326,7 @@ if(localStorage.id3 == "changed"){
     localStorage.id3 = "unchanged"
   chrome.tabs.reload()
   })
-  
+
   document.querySelector('#add3').addEventListener('click',()=>{
     if(localStorage.item_Link3.slice(0,5)=="https"){
       chrome.tabs.update({url:`${localStorage.item_Link3}`})
@@ -354,7 +354,7 @@ if(localStorage.id3 == "changed"){
         alert("Enter Link name starting with an Alphabet.")
         chrome.tabs.reload()
        }
-     
+
     })
     })
 }
@@ -376,4 +376,4 @@ if (localStorage.firstTime != "false"){
   localStorage.choice = "false"
   localStorage.category = "waifu";
   localStorage.firstTime = "false";
-}  
+}

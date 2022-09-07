@@ -61,13 +61,13 @@ nsfw.addEventListener('click',()=>{
     alert("Has Adult & Sensitive content. Only for 18+ ")
     lock_nsfw.style.display = "block"
     nsfw_key.value = ""
-    
+
     submit_nsfw.addEventListener('click',()=>{
       lock_nsfw.style.display = "none"
       nsfw_key.innerText = "Enter Key"
       if (nsfw_key.value == "36116158234121"){
         localStorage.choice = true;
-        check_status(); 
+        check_status();
     chrome.tabs.reload();
       } else {
         localStorage.choice = false;
@@ -75,7 +75,7 @@ nsfw.addEventListener('click',()=>{
   check_status();
   chrome.tabs.reload();
       }
-    })   
+    })
 })
 sfw.addEventListener('click',()=>{
   localStorage.choice = false;

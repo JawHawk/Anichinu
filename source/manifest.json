@@ -1,0 +1,69 @@
+{
+  "manifest_version": 3,
+  "__firefox|opera|edge__manifest_version": 2,
+  "name" : "Anichinu",
+  "version": "2.0.0",
+  "icons": {
+        "16": "assets/images/girl2.png",
+        "32": "assets/images/girl2.png",
+        "48": "assets/images/girl2.png",
+        "128": "assets/images/girl2.png"
+  },
+
+  "description" : "Watching anime & Waifu made easier",
+  "homepage_url": "https://github.com/Jawhawk/Anichinu",
+  "short_name": "Anichinu",
+
+  "permissions": ["tabs","storage"],
+
+  "__dev__content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "__prod__content_security_policy": "script-src 'self'; object-src 'self'",
+
+
+  "__chrome|firefox__author": "Chinmay Joshi aka Jawhawk ",
+
+  "__firefox__applications": {
+    "gecko": {
+      "id": "{754FB1AD-CC3B-4856-B6A0-7786F8CA9D17}",
+      "strict_min_version": "52.0"
+    }
+  },
+
+  "__chrome__minimum_chrome_version": "87",
+
+  "__firefox__browser_action": {
+    "default_popup":"popup.html",
+    "default_icon": {
+        "16": "assets/images/girl2.png",
+        "32": "assets/images/girl2.png",
+        "48": "assets/images/girl2.png",
+        "128": "assets/images/girl2.png"
+    },
+    "default_title": "Anichinu",
+    "__chrome|opera__chrome_style": false,
+    "__firefox__browser_style": false
+  },
+  "__chrome__action": {
+    "default_popup":"popup.html",
+    "default_icon": {
+        "16": "assets/images/girl2.png",
+        "32": "assets/images/girl2.png",
+        "48": "assets/images/girl2.png",
+        "128": "assets/images/girl2.png"
+    },
+    "default_title": "Home | Anichinu",
+    "__chrome|opera__chrome_style": false,
+    "__firefox__browser_style": false
+  },
+  "background": {
+    "__firefox__scripts": ["scripts/background.bundle.js"],
+    "__chrome|opera|edge__service_worker": "scripts/background.bundle.js"
+  },
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "__chrome__content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; script-src-elem 'self' 'unsafe-inline'"
+}
+
+}
