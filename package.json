@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": "https://github.com/Jawhawk/Anichinu",
   "author": {
-    "name": "Chinmay Joshi aka Jawhawk",
+    "name": "Chinmay Joshi aka Jawhawk"
   },
   "engines": {
     "node": ">=10.0.0",
