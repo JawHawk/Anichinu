@@ -20,7 +20,6 @@ const extensionReloaderPlugin =
         reloadPage: true,
         entries: {
           // TODO: reload manifest on update
-          background: 'background',
           extensionPage: ['popup'],
         },
       })
@@ -53,9 +52,6 @@ module.exports = {
 
   entry: {
     manifest: './source/manifest.json',
-    background: './source/scripts/background.js',
-    popup: './source/scripts/popup.js',
-    newtab: './source/scripts/newtab.js',
   },
 
   output: {
@@ -168,6 +164,10 @@ module.exports = {
 
     new CopyWebpackPlugin({
       patterns: [{from: 'source/styles', to: 'styles'}],
+    }),
+    // copy scripts
+    new CopyWebpackPlugin({
+      patterns: [{from: 'source/scripts', to: 'scripts'}],
     }),
 
     // copy anime-list data

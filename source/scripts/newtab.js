@@ -1,22 +1,22 @@
 //document elements
-watch = document.querySelector('.watch');
-anime = document.getElementById('name');
-ep = document.getElementById('ep');
-nsfw = document.querySelector('.nsfw')
-sfw = document.querySelector('.sfw')
-anime_name = document.querySelector('.anime-name')
-add = document.querySelectorAll('.add')
-add_Item = document.querySelector('.add-item')
-item_Name = document.querySelector('.item-name')
-item_Link = document.querySelector('.item-link')
-done = document.querySelector('.done')
-minus1 = document.querySelector('.minus1')
-minus2 = document.querySelector('.minus2')
-minus3 = document.querySelector('.minus3')
-add1 = document.querySelector('#add1')
-add2 = document.querySelector('#add2')
-add3 = document.querySelector('#add3')
-dropdown = document.querySelector('#dropdown')
+let watch = document.querySelector('.watch');
+let anime = document.getElementById('name');
+let ep = document.getElementById('ep');
+let nsfw = document.querySelector('.nsfw')
+let sfw = document.querySelector('.sfw')
+let anime_name = document.querySelector('.anime-name')
+let add = document.querySelectorAll('.add')
+let add_Item = document.querySelector('.add-item')
+let item_Name = document.querySelector('.item-name')
+let item_Link = document.querySelector('.item-link')
+let done = document.querySelector('.done')
+let minus1 = document.querySelector('.minus1')
+let minus2 = document.querySelector('.minus2')
+let minus3 = document.querySelector('.minus3')
+let add1 = document.querySelector('#add1')
+let add2 = document.querySelector('#add2')
+let add3 = document.querySelector('#add3')
+let dropdown = document.querySelector('#dropdown')
 
 let animeList,zoroList;
 fetch("../anime_data/AnimeList.json").then(res => res.json()).then(data => animeList = data)

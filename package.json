@@ -1,14 +1,12 @@
 {
-  "name": "web-extension-starter",
-  "version": "1.0.0",
-  "description": "Web extension starter",
+  "name": "Anichinu",
+  "version": "1.2.2",
+  "description": "Watching Anime & Waifu made easier",
   "private": true,
   "license": "MIT",
-  "repository": "https://github.com/abhijithvijayan/web-extension-starter.git",
+  "repository": "https://github.com/Jawhawk/Anichinu",
   "author": {
-    "name": "abhijithvijayan",
-    "email": "email@abhijithvijayan.in",
-    "url": "https://abhijithvijayan.in"
+    "name": "Chinmay Joshi aka Jawhawk",
   },
   "engines": {
     "node": ">=10.0.0",
