@@ -1,5 +1,5 @@
 # Anichinu v1.22
-Watching Anime & Waifu made easier : https://chrome.google.com/webstore/detail/anichinu/bempahanfbelceikgbhicebchefdlpog 
+Anichinu is a browser extension which makes watching Anime & Waifu easier : https://chrome.google.com/webstore/detail/anichinu/bempahanfbelceikgbhicebchefdlpog 
 
 To start with development:
 
