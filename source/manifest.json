@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "__firefox|opera|edge__manifest_version": 2,
   "name" : "Anichinu",
-  "version": "1.2.2",
+  "version": "1.22",
   "icons": {
         "16": "assets/images/girl2.png",
         "32": "assets/images/girl2.png",
@@ -26,8 +26,6 @@
       "strict_min_version": "52.0"
     }
   },
-
-  "__chrome__minimum_chrome_version": "87",
 
   "__firefox__browser_action": {
     "default_popup":"popup.html",
