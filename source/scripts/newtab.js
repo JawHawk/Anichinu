@@ -216,9 +216,9 @@ function click() {
       }
     } else { 
       //zoro 
-      let anime_obj = zoroList.filter((el)=>el.name == anime.value)
+      let anime_obj = zoroList.find((el)=>el.name === anime.value)
       if (anime_obj.length != 0) {
-          let link = anime_obj[0].link;
+          let link = anime_obj.link;
           chrome.tabs.update({
             url: `${link.slice(0, 16)}watch/${link.slice(16)}`,
           });
