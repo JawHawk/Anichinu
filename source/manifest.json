@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "__firefox|opera|edge__manifest_version": 2,
   "name" : "Anichinu",
-  "version": "1.22",
+  "version": "1.23",
   "icons": {
         "16": "assets/images/girl2.png",
         "32": "assets/images/girl2.png",

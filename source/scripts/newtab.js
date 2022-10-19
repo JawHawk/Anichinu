@@ -1,9 +1,14 @@
+if (localStorage.firstTime != "false") {
+  localStorage.bgimg = "on";
+  localStorage.choice = "false";
+  localStorage.category = "waifu";
+  localStorage.firstTime = "false";
+}
+
 //document elements
 let watch = document.querySelector(".watch");
 let anime = document.getElementById("name");
 let ep = document.getElementById("ep");
-let nsfw = document.querySelector(".nsfw");
-let sfw = document.querySelector(".sfw");
 let anime_name = document.querySelector(".anime-name");
 let add = document.querySelectorAll(".add");
 let add_Item = document.querySelector(".add-item");
@@ -12,12 +17,13 @@ let item_Link = document.querySelector(".item-link");
 let done = document.querySelector(".done");;
 let dropdown = document.querySelector("#dropdown");
 
-let black_theme = "rgb(255, 199, 193)"
+const suggs = document.querySelectorAll(".sugg");
+const black_theme = "rgb(255, 199, 193)";
 
-let animeList, zoroList;
-fetch("../anime_data/AnimeList.json")
+let zoroList, gogoList;
+fetch("../anime_data/gogoList.json")
   .then((res) => res.json())
-  .then((data) => (animeList = data));
+  .then((data) => (gogoList = data.gogoList));
 fetch("../anime_data/zoroList.json")
   .then((res) => res.json())
   .then((data) => (zoroList = data.zoroList));
@@ -29,10 +35,9 @@ if (localStorage.bg == "black") {
   document.querySelector(".suggestion").style.color = "white";
   document.querySelector(".input").style.border = "none";
   document.querySelector(".watch").style.marginTop = "6px";
-  document.querySelector(".personal").style.color = black_theme;
-  document.querySelector(".txtyou").style.color = black_theme;
-  document.querySelector(".txtgmail").style.color = black_theme;
-  document.querySelector(".txtdrive").style.color = black_theme;
+  const selec = [".personal",".txtyou",'.txtgmail','.txtdrive']
+  for(let i = 0;i < selec.length; i++){ document.querySelector(selec[i]).style.color = black_theme; }
+
 } else {
   document.body.style.background = "white";
   document.querySelector(".credits").style.color = "black";
@@ -54,13 +59,13 @@ function category_changer() {
     for (let i = 0; i < nsfw_categories.length ; i++) {
       var option = document.createElement("option");
       option.appendChild(document.createTextNode(nsfw_categories[i]));
-      document.querySelector('#dropdown').appendChild(option);
+      dropdown.appendChild(option);
     }
   } else {
     for (let i = 0; i < sfw_categories.length; i++) {
       var option = document.createElement("option");
       option.appendChild(document.createTextNode(sfw_categories[i]));
-      document.querySelector('#dropdown').appendChild(option);
+      dropdown.appendChild(option);
     }
   }
 }
@@ -68,18 +73,13 @@ category_changer();
 
 document.querySelector("#option0").innerHTML = localStorage.category;
 dropdown.addEventListener("change", () => {
-  if (localStorage.choice == "true") {
-    localStorage.category = nsfw_categories[dropdown.selectedIndex - 1];
-  }
-  else{
-  localStorage.category = sfw_categories[dropdown.selectedIndex - 1];
-  }
+  localStorage.choice == "true" ? localStorage.category = nsfw_categories[dropdown.selectedIndex - 1] 
+  : localStorage.category = sfw_categories[dropdown.selectedIndex - 1];
   chrome.tabs.reload();
 });
 
 //=====================================================================================================================
 // nsfw / sfw
-
 if (localStorage.bgimg == "off") {
   document.querySelector(".off-bg").style.border = "2px solid blue";
   document.getElementById("bg").style.display = "none";
@@ -89,38 +89,24 @@ if (localStorage.bgimg == "off") {
 } else {
   document.querySelector(".on-bg").style.border = "2px solid blue";
   document.getElementById("bg").style.display = "block";
-  if (localStorage.choice == "true") {
-    const getUrl = async () => {
-      const res = await fetch(
-        `https://api.waifu.im/random/?selected_tags=${localStorage.category}&is_nsfw=true`
-      );
-      const json = await res.json();
-      document.querySelector("#bg").src = json.images[0].url;
-    };
-    getUrl();
-  } else {
-    const getUrl = async () => {
-      if (localStorage.choice == undefined) {
-        localStorage.choice = "waifu";
-        chrome.tabs.reload();
-      }
-      const res = await fetch(
-        `https://api.waifu.im/random/?selected_tags=${localStorage.category}&is_nsfw=false`
-      );
-      const json = await res.json();
-      document.querySelector("#bg").src = json.images[0].url;
-    };
-    getUrl();
+  const getUrl = async() => {
+    var choice1;
+    localStorage.choice == "true" ? choice1 = 'true' : choice1 = 'false'
+    const res = await fetch(
+      `https://api.waifu.im/random/?selected_tags=${localStorage.category}&is_nsfw=${choice1}`
+    );
+    const json = await res.json();
+    document.querySelector("#bg").src = json.images[0].url;
   }
+  getUrl();
 }
-
 //==============================================================================================================================================
 // Input Suggestions , site preference : zoro / gogo
 
 anime.addEventListener("keyup", () => {
   var filteredList;
   if (localStorage.site == "gogo") {
-    filteredList = animeList.AnimeList.reduce((total,item)=>{
+    filteredList = gogoList.reduce((total,item)=>{
       if (item.name.includes((anime.value).toLowerCase())) { total.push(item.name) }    
       return total
     },[])
@@ -129,9 +115,8 @@ anime.addEventListener("keyup", () => {
       if (item.name.includes((anime.value).toLowerCase())) { total.push(item.name) }    
       return total
     },[]) }
-
+  
   var i = 0;
-  const suggs = document.querySelectorAll(".sugg");
   suggs.forEach((element) => {
     if (filteredList[i] == undefined) {
       element.style.display = "none";
@@ -141,15 +126,12 @@ anime.addEventListener("keyup", () => {
     }
     i++;
   });
-
 });
 
 //=================================================================================================================================================
 //keyboard suggestions
 var i = 0;
-
 anime.addEventListener("keydown", (event) => {
-  const suggs = document.querySelectorAll(".sugg");
   suggs.forEach((element) => {
     element.addEventListener("click", () => {
       anime.value = element.innerHTML;
@@ -186,38 +168,24 @@ anime.addEventListener("keydown", (event) => {
 watch.addEventListener("click", click);
 
 function click() {
-  //gogoanime
-  let anime_name = String(anime.value); 
   if (anime.value == "") {
-    if (localStorage.site == "gogo") {
-      chrome.tabs.update({ url: `https://gogoanime.gg` });
-    } else {
-      chrome.tabs.update({ url: `https://zoro.to/home` });
-    }
+    localStorage.site == "gogo" 
+    ? chrome.tabs.update({ url: `https://gogoanime.gg` }) 
+    : chrome.tabs.update({ url: `https://zoro.to/home` });
   } else {
+    //gogoanime
     if (localStorage.site == "gogo") {
-        anime_name = anime_name.replaceAll(" ", "-");
-      anime_name = anime_name.replaceAll(".", "");
-      anime_name = anime_name.replaceAll(":", "");
-      anime_name = anime_name.replaceAll("(", "-");
-      anime_name = anime_name.replaceAll(")", "");
-      anime_name = anime_name.replaceAll("/", "");
-      anime_name = anime_name.replaceAll("---", "-");
-      anime_name = anime_name.replaceAll("--", "-");
-      episode = String(ep.value);
-      if (ep.value) {
-        chrome.tabs.update({
-          url: `https://gogoanime.wiki/${anime_name}-episode-${episode}`,
-        });
-      } else {
-        chrome.tabs.update({
-          url: `https://gogoanime.wiki/category/${anime_name}`,
-        });
+      let anime_obj = gogoList.find((el)=>el.name === anime.value)
+      if (anime_obj != undefined) {
+          let link = anime_obj.link;
+          chrome.tabs.update({url: `${link}`});
       }
+      else{ alert("Choose from the options below or write correct anime name"); }
+
     } else { 
       //zoro 
       let anime_obj = zoroList.find((el)=>el.name === anime.value)
-      if (anime_obj.length != 0) {
+      if (anime_obj != undefined) {
           let link = anime_obj.link;
           chrome.tabs.update({
             url: `${link.slice(0, 16)}watch/${link.slice(16)}`,
@@ -288,11 +256,5 @@ document.querySelector(".off-bg").addEventListener("click", () => {
   localStorage.bgimg = "off";
   chrome.tabs.reload();
 });
-
 //============================
-if (localStorage.firstTime != "false") {
-  localStorage.bgimg = "on";
-  localStorage.choice = "false";
-  localStorage.category = "waifu";
-  localStorage.firstTime = "false";
-}
+

@@ -1,0 +1,14 @@
+@import url("https://fonts.googleapis.com/css?family=Nunito:400,600");
+@import '~advanced-css-reset/dist/reset.css';
+@import "~webext-base-css/webext-base.css";
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+}
+
+body {
+  color: #0d0d0d;
+  background-color: #f3f3f3;
+}/*# sourceMappingURL=options.css.map */
