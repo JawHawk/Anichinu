@@ -92,11 +92,15 @@ if (localStorage.bgimg == "off") {
   const getUrl = async() => {
     var choice1;
     localStorage.choice == "true" ? choice1 = 'true' : choice1 = 'false'
-    const res = await fetch(
-      `https://api.waifu.im/random/?selected_tags=${localStorage.category}&is_nsfw=${choice1}`
-    );
-    const json = await res.json();
-    document.querySelector("#bg").src = json.images[0].url;
+    try {
+      var res = await fetch(
+        `https://api.waifu.im/search/?selected_tags=${localStorage.category}&is_nsfw=${choice1}`
+      );
+      const json = await res.json();
+      document.querySelector("#bg").src = json.images[0].url;
+    } catch (error) {
+      alert('The Image API is currently down. Kindly turn off background till we fix it.')
+    }
   }
   getUrl();
 }
