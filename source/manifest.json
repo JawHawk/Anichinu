@@ -2,14 +2,13 @@
   "manifest_version": 3,
   "__firefox|opera|edge__manifest_version": 2,
   "name" : "Anichinu",
-  "version": "1.24",
+  "version": "1.25",
   "icons": {
         "16": "assets/images/girl2.png",
         "32": "assets/images/girl2.png",
         "48": "assets/images/girl2.png",
         "128": "assets/images/girl2.png"
   },
-
   "description" : "Watching anime & Waifu made easier",
   "homepage_url": "https://github.com/Jawhawk/Anichinu",
   "short_name": "Anichinu",

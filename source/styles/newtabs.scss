@@ -245,7 +245,7 @@ body{
     z-index: 1;
     color: white;
     cursor: pointer;
-    opacity: 0.45;
+    opacity: 0.35;
     .chinu{gap: 10px;
         margin-bottom: 5px;
     align-items: center;}
@@ -256,5 +256,69 @@ body{
         a{color: white;text-decoration: underline;cursor: pointer;}
     }
 }
+
+//==================================================================================================================
   
-  
+.openSection{
+    position: absolute;
+    right: 0;
+    top: 50%;
+    height: 50px;
+    transform: translateY(-50%);
+    z-index: 6;
+    border-radius: 50% 0 0 50%;
+    background: white;
+    border: 2px solid #173d3a;
+    color: #173d3a;
+    font-weight: 500;
+    cursor: pointer;
+    &:hover{
+        border: 2px solid rgb(99, 156, 176);
+    }
+}
+
+.childDiv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 200px;
+    border: 1px solid black;
+    background: #173d3a;
+    cursor: pointer;
+    color: rgb(255, 199, 193);
+    font-size: 14px;
+    font-weight: 500;
+    &:hover{
+        transition: 0.2s;
+    transform: scale(1.03);
+    border: 1px solid rgb(99, 156, 176);
+    }
+}
+
+.parentDiv {
+    background: rgb(24, 33, 24);
+    padding: 20px;
+    grid-template-columns: auto auto;
+    gap: 25px;
+    height: 95vh;
+    overflow: scroll;
+    overflow-x: hidden;
+    position: absolute;
+    top:0;
+    right: 0;
+    z-index: 5;
+    transition: 0.5s;
+    box-shadow: -20px 0 180px 10px black;
+    .parentDivHeading{
+        grid-column: 1 / 3;
+        text-align: center;
+        color: rgb(255, 199, 193);
+        font-style: italic;
+    }
+    img{
+        width: 200px;
+        height: 230px;
+        }
+}
+

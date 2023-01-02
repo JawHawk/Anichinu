@@ -94,7 +94,7 @@ if (localStorage.bgimg == "off") {
     localStorage.choice == "true" ? choice1 = 'true' : choice1 = 'false'
     try {
       var res = await fetch(
-        `https://api.waifu.im/search/?selected_tags=${localStorage.category}&is_nsfw=${choice1}`
+        `https://api.waifu.im/search/?included_tags=${localStorage.category}&is_nsfw=${choice1}`
       );
       const json = await res.json();
       document.querySelector("#bg").src = json.images[0].url;

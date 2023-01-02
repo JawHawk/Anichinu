@@ -12,7 +12,7 @@ gogo = document.querySelector('.gogo')
 zoro = document.querySelector('.zoro')
 black_bg = document.querySelector('.black')
 white_bg = document.querySelector('.white')
-console.log("yes");
+
 function check_status(){
   if(localStorage.choice == "true"){
     nsfw.style.backgroundPosition = "left"
