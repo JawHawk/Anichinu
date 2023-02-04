@@ -3,7 +3,7 @@ openSectionBtn.className = 'openSection'
 openSectionBtn.innerText = '<'
 document.body.appendChild(openSectionBtn)
 
-fetch("https://gogoanime.consumet.org/recent-release")
+fetch("https://gogoanime.consumet.stream/recent-release")
   .then((response) => response.json())
   .then((animelist) => display(animelist));
 

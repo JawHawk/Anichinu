@@ -206,6 +206,7 @@ function click() {
 
 add.forEach((element)=>{
   let id_no = (element.id).slice(10)
+  const add_element = document.querySelector(`#add${id_no}`) 
   if ( localStorage.getItem(`id${id_no}`) == "changed") {
     document.querySelector(`.addimg${id_no}`).src = `./assets/images/letter-${localStorage.getItem(`item_Name${id_no}`).slice(0, 1).toLowerCase()}.png`;
     document.querySelector(`.txtnew${id_no}`).innerHTML = `${localStorage.getItem(`item_Name${id_no}`)}`;
@@ -215,7 +216,7 @@ add.forEach((element)=>{
       localStorage.setItem(`id${id_no}`,"unchanged");
       chrome.tabs.reload();
     })
-    document.querySelector(`#add${id_no}`).addEventListener("click", () => {
+    add_element.addEventListener("click", () => {
       update_link = localStorage.getItem(`item_Link${id_no}`)
       if (update_link.slice(0, 5) == "https") {
         chrome.tabs.update({ url: `${update_link}` });
@@ -227,10 +228,17 @@ add.forEach((element)=>{
     });
   }
   else { 
-    document.querySelector(`#add${id_no}`).addEventListener("click", () => {
+    add_element.addEventListener("click", () => {
       add_Item.style.display = "flex";
       anime_name.style.opacity = "0.2";
       bg.style.opacity = "0.2";
+      window.addEventListener('mouseup',function(event){
+        if(event.target != add_Item && event.target.parentNode != add_Item){
+          add_Item.style.display = "none";
+          anime_name.style.opacity = "1";
+          bg.style.opacity = "1";
+        }
+      });
       done.addEventListener("click", () => {
         if((item_Name.value).length == 0){
           alert("Enter Link Name ")
