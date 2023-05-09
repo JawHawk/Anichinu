@@ -310,6 +310,8 @@ body{
     z-index: 5;
     transition: 0.5s;
     box-shadow: -20px 0 180px 10px black;
+    width: 50vw;
+    max-width: 445px;
     .parentDivHeading{
         grid-column: 1 / 3;
         text-align: center;

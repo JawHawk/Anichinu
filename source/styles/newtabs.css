@@ -199,7 +199,6 @@ body {
 
 .category {
   position: absolute;
-  width: -webkit-max-content;
   width: -moz-max-content;
   width: max-content;
   top: 20px;
@@ -316,6 +315,8 @@ body {
   z-index: 5;
   transition: 0.5s;
   box-shadow: -20px 0 180px 10px black;
+  width: 50vw;
+  max-width: 445px;
 }
 .parentDiv .parentDivHeading {
   grid-column: 1/3;

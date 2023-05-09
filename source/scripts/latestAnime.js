@@ -3,18 +3,28 @@ openSectionBtn.className = 'openSection'
 openSectionBtn.innerText = '<'
 document.body.appendChild(openSectionBtn)
 
-fetch("https://gogoanime.consumet.stream/recent-release")
+const parentDiv = document.createElement('div');
+parentDiv.className = 'parentDiv';
+parentDiv.style.display = 'none';
+
+const heading = document.createElement('h1');
+heading.className = 'parentDivHeading'
+heading.innerText = 'Loading ...'
+parentDiv.appendChild(heading) 
+
+document.body.appendChild(parentDiv);
+
+fetch("https://webdis-vta0.onrender.com/recent-release")
   .then((response) => response.json())
-  .then((animelist) => display(animelist));
+  .then((animelist) => display(animelist))
+  .catch(err => fetchError());
+
+function fetchError() {
+  heading.innerText = "There's some error, please try again later."
+}
 
 function display(animelist){
-    const parentDiv = document.createElement('div');
-    parentDiv.className = 'parentDiv';
-
-    const heading = document.createElement('h1');
-    heading.className = 'parentDivHeading'
     heading.innerText = 'Latest Episodes'
-    parentDiv.appendChild(heading)
 
     for(let i = 0; i < 12; i++){
         const anime = animelist[i]
@@ -42,29 +52,27 @@ function display(animelist){
         })
         parentDiv.appendChild(childDiv);
     }
-    parentDiv.style.display = 'none'
-    document.body.appendChild(parentDiv);
-
-    //open and close
-    openSectionBtn.addEventListener('click',()=>{
-      if ( parentDiv.style.display == 'none'){
-        parentDiv.style.display = 'grid'
-        openSectionBtn.innerText = '>'
-        openSectionBtn.style.right = '480px'
-      } else {
-        parentDiv.style.display = 'none'
-        openSectionBtn.innerText = '<'
-        openSectionBtn.style.right = '0'
-      }
-    }) 
-    window.addEventListener('mouseup',function(event){
-      if(event.target != parentDiv && event.target.parentNode != parentDiv && event.target != openSectionBtn){
-        parentDiv.style.display = 'none'
-        openSectionBtn.innerText = '<'
-        openSectionBtn.style.right = '0'
-      }
-    });
 }
+
+//open and close
+openSectionBtn.addEventListener('click',()=>{
+  if ( parentDiv.style.display == 'none'){
+    parentDiv.style.display = 'grid'
+    openSectionBtn.innerText = '>'
+    openSectionBtn.style.right = window.innerWidth*0.5 > 480 ? '480px' : `${window.innerWidth*0.5 + 30}px`
+  } else {
+    parentDiv.style.display = 'none'
+    openSectionBtn.innerText = '<'
+    openSectionBtn.style.right = '0'
+  }
+}) 
+window.addEventListener('mouseup',function(event){
+  if(event.target != parentDiv && event.target.parentNode != parentDiv && event.target != openSectionBtn){
+    parentDiv.style.display = 'none'
+    openSectionBtn.innerText = '<'
+    openSectionBtn.style.right = '0'
+  }
+});
 
 
 
