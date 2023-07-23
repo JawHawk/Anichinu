@@ -1,6 +1,9 @@
 # Anichinu v1.28
 Anichinu is a browser extension which makes watching Anime & Waifu easy : https://chrome.google.com/webstore/detail/anichinu/bempahanfbelceikgbhicebchefdlpog 
 
+![image](https://github.com/JawHawk/Anichinu/assets/86140365/74390d7b-fe49-4263-ad14-7c9df3b72ebc)
+
+
 To start with development:
 
 - `yarn install` to install dependencies.
