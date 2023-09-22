@@ -1,218 +1,171 @@
-const path = require('path');
-const webpack = require('webpack');
-const FilemanagerPlugin = require('filemanager-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const ExtensionReloader = require('webpack-extension-reloader');
-const WextManifestWebpackPlugin = require('wext-manifest-webpack-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+var webpack = require('webpack'),
+  path = require('path'),
+  fileSystem = require('fs-extra'),
+  env = require('./utils/env'),
+  CopyWebpackPlugin = require('copy-webpack-plugin'),
+  HtmlWebpackPlugin = require('html-webpack-plugin'),
+  TerserPlugin = require('terser-webpack-plugin');
+var { CleanWebpackPlugin } = require('clean-webpack-plugin');
+var ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+var ReactRefreshTypeScript = require('react-refresh-typescript');
 
-const nodeEnv = process.env.NODE_ENV || 'development';
-const targetBrowser = process.env.TARGET_BROWSER;
+const ASSET_PATH = process.env.ASSET_PATH || '/';
 
-const extensionReloaderPlugin =
-  nodeEnv === 'development'
-    ? new ExtensionReloader({
-        port: 9090,
-        reloadPage: true,
-        entries: {
-          // TODO: reload manifest on update
-          extensionPage: ['popup'],
-        },
-      })
-    : () => {
-        this.apply = () => {};
-      };
+var alias = {};
 
-const getExtensionFileType = (browser) => {
-  if (browser === 'opera') {
-    return 'crx';
-  }
-  if (browser === 'firefox') {
-    return 'xpi';
-  }
+// load the secrets
+var secretsPath = path.join(__dirname, 'secrets.' + env.NODE_ENV + '.js');
 
-  return 'zip';
-};
+var fileExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg'];
 
-module.exports = {
-  devtool: false, // https://github.com/webpack/webpack/issues/1194#issuecomment-560382342
+if (fileSystem.existsSync(secretsPath)) {
+  alias['secrets'] = secretsPath;
+}
 
-  mode: nodeEnv,
+const isDevelopment = process.env.NODE_ENV !== 'production';
 
-  stats: {
-    all: false,
-    builtAt: true,
-    errors: true,
-    hash: true,
-  },
-
+var options = {
+  mode: process.env.NODE_ENV || 'development',
   entry: {
-    manifest: './source/manifest.json',
+    newtab: path.join(__dirname, 'src', 'pages', 'Newtab', 'index.jsx'),
+    popup: path.join(__dirname, 'src', 'pages', 'Popup', 'index.jsx'),
   },
-
+  chromeExtensionBoilerplate: {
+    notHotReload: ['background', 'contentScript', 'devtools'],
+  },
   output: {
-    path: path.resolve(__dirname, 'extension', targetBrowser),
-    filename: 'scripts/[name].bundle.js',
+    filename: '[name].bundle.js',
+    path: path.resolve(__dirname, 'build'),
+    clean: true,
+    publicPath: ASSET_PATH,
   },
-
   module: {
     rules: [
       {
-        type: 'javascript/auto', // prevent webpack handling json with its own loaders,
-        test: /manifest\.json$/,
-        use: {
-          loader: 'wext-manifest-loader',
-          options: {
-            usePackageJSONVersion: true, // set to false to not use package.json version for manifest
-          },
-        },
-      },
-      {
-        test: /.(js|jsx)$/,
-        include: [path.resolve(__dirname, 'source/scripts')],
-        loader: 'babel-loader',
-
-        options: {
-          plugins: ['syntax-dynamic-import'],
-
-          presets: [
-            [
-              '@babel/preset-env',
-              {
-                modules: false,
-              },
-            ],
-          ],
-        },
-      },
-      {
-        test: /\.scss$/,
+        test: /\.(css|scss)$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader, // It creates a CSS file per JS file which contains CSS
+            loader: 'style-loader',
           },
           {
             loader: 'css-loader',
-            options: {
-              sourceMap: nodeEnv === 'development',
-            },
           },
           {
-            loader: 'postcss-loader',
+            loader: 'sass-loader',
             options: {
-              postcssOptions: {
-                plugins: [
-                  [
-                    'autoprefixer',
-                    {
-                      // Options
-                    },
-                  ],
-                ],
-              },
+              sourceMap: true,
             },
           },
-          'resolve-url-loader',
-          'sass-loader',
         ],
+      },
+      {
+        test: new RegExp('.(' + fileExtensions.join('|') + ')$'),
+        type: 'asset/resource',
+        exclude: /node_modules/,
+        // loader: 'file-loader',
+        // options: {
+        //   name: '[name].[ext]',
+        // },
+      },
+      {
+        test: /\.html$/,
+        loader: 'html-loader',
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.(ts|tsx)$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: require.resolve('ts-loader'),
+            options: {
+              getCustomTransformers: () => ({
+                before: [isDevelopment && ReactRefreshTypeScript()].filter(
+                  Boolean
+                ),
+              }),
+              transpileOnly: isDevelopment,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(js|jsx)$/,
+        use: [
+          {
+            loader: 'source-map-loader',
+          },
+          {
+            loader: require.resolve('babel-loader'),
+            options: {
+              plugins: [
+                isDevelopment && require.resolve('react-refresh/babel'),
+              ].filter(Boolean),
+            },
+          },
+        ],
+        exclude: /node_modules/,
       },
     ],
   },
-
+  resolve: {
+    alias: alias,
+    extensions: fileExtensions
+      .map((extension) => '.' + extension)
+      .concat(['.js', '.jsx', '.ts', '.tsx', '.css']),
+  },
   plugins: [
+    isDevelopment && new ReactRefreshWebpackPlugin(),
+    new CleanWebpackPlugin({ verbose: false }),
     new webpack.ProgressPlugin(),
-    // Generate manifest.json
-    new WextManifestWebpackPlugin(),
-    // Generate sourcemaps
-    new webpack.SourceMapDevToolPlugin({filename: false}),
-    new webpack.EnvironmentPlugin(['NODE_ENV', 'TARGET_BROWSER']),
-    new CleanWebpackPlugin({
-      cleanOnceBeforeBuildPatterns: [
-        path.join(process.cwd(), `extension/${targetBrowser}`),
-        path.join(
-          process.cwd(),
-          `extension/${targetBrowser}.${getExtensionFileType(targetBrowser)}`
-        ),
+    new webpack.EnvironmentPlugin(['NODE_ENV']),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: 'src/manifest.json',
+          to: path.join(__dirname, 'build'),
+          force: true,
+          transform: function (content, path) {
+            return Buffer.from(
+              JSON.stringify({
+                description: process.env.npm_package_description,
+                version: process.env.npm_package_version,
+                ...JSON.parse(content.toString()),
+              })
+            );
+          },
+        },
       ],
-      cleanStaleWebpackAssets: false,
-      verbose: true,
-    }),
-    // write css file(s) to build folder
-    new MiniCssExtractPlugin({filename: 'styles/[name].css'}),
-    new HtmlWebpackPlugin({
-      template: 'source/popup.html',
-      inject: 'body',
-      hash: true,
-      chunks: ['popup'],
-      filename: 'popup.html',
     }),
     new HtmlWebpackPlugin({
-      template: 'source/newtab.html',
-      inject: 'body',
-      hash: true,
-      chunks: ['popup'],
+      template: path.join(__dirname, 'src', 'pages', 'Newtab', 'index.html'),
       filename: 'newtab.html',
+      chunks: ['newtab'],
+      cache: false,
     }),
-    // copy static assets
-    new CopyWebpackPlugin({
-      patterns: [{from: 'source/assets', to: 'assets'}],
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, 'src', 'pages', 'Popup', 'index.html'),
+      filename: 'popup.html',
+      chunks: ['popup'],
+      cache: false,
     }),
+  ].filter(Boolean),
+  infrastructureLogging: {
+    level: 'info',
+  },
+};
 
-    new CopyWebpackPlugin({
-      patterns: [{from: 'source/styles', to: 'styles'}],
-    }),
-    // copy scripts
-    new CopyWebpackPlugin({
-      patterns: [{from: 'source/scripts', to: 'scripts'}],
-    }),
-
-    // copy anime-list data
-    new CopyWebpackPlugin({
-      patterns: [{from: 'source/anime_data', to: 'anime_data'}],
-    }),
-    // plugin to enable browser reloading in development mode
-    extensionReloaderPlugin,
-  ],
-
-  optimization: {
+if (env.NODE_ENV === 'development') {
+  options.devtool = 'cheap-module-source-map';
+} else {
+  options.optimization = {
     minimize: true,
     minimizer: [
       new TerserPlugin({
-        parallel: true,
-        terserOptions: {
-          format: {
-            comments: false,
-          },
-        },
         extractComments: false,
       }),
-      new OptimizeCSSAssetsPlugin({
-        cssProcessorPluginOptions: {
-          preset: ['default', {discardComments: {removeAll: true}}],
-        },
-      }),
-      new FilemanagerPlugin({
-        events: {
-          onEnd: {
-            archive: [
-              {
-                format: 'zip',
-                source: path.join(__dirname, 'extension', targetBrowser),
-                destination: `${path.join(
-                  __dirname,
-                  'extension',
-                  targetBrowser
-                )}.${getExtensionFileType(targetBrowser)}`,
-                options: {zlib: {level: 6}},
-              },
-            ],
-          },
-        },
-      }),
     ],
-  },
-};
+  };
+}
+
+module.exports = options;
