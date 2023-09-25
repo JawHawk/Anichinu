@@ -13,8 +13,12 @@
     "prettier": "prettier --write '**/*.{js,jsx,ts,tsx,json,css,scss,md}'"
   },
   "dependencies": {
+    "@mantine/core": "^7.0.0",
+    "@mantine/hooks": "^7.0.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
+    "tabler-icons-react": "^1.56.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",
@@ -42,6 +46,9 @@
     "fs-extra": "^11.1.0",
     "html-loader": "^4.2.0",
     "html-webpack-plugin": "^5.5.0",
+    "postcss": "^8.4.30",
+    "postcss-preset-mantine": "^1.7.0",
+    "postcss-simple-vars": "^7.0.1",
     "prettier": "^2.8.3",
     "react-refresh": "^0.14.0",
     "react-refresh-typescript": "^2.0.7",
