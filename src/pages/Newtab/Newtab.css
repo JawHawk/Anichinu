@@ -1,6 +1,5 @@
 html {
-  overflow: hidden;
-  background-color: white;
+background-color: white !important;
 }
 
 .addlink :hover{

@@ -23,10 +23,12 @@ import {
   useMantineTheme,
   rem,
   useComputedColorScheme,
+  OptionsFilter,
+  ComboboxItem,
 } from '@mantine/core';
 import LinkSection from './components/LinkSection';
 import anichinuLogo from '../../assets/img/anichinu.png';
-import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import { useDisclosure } from '@mantine/hooks';
 import AnimeBox from './components/AnimeBox';
 import {
   AlertTriangle,
@@ -35,10 +37,12 @@ import {
   Search,
   Settings,
   Sun,
-  Tex,
 } from 'tabler-icons-react';
 import { Toaster, toast } from 'react-hot-toast';
 import fetchImage from './util/fetchImage';
+import gogoanimeData from './assets/gogoanimeData.json';
+import includesString from './util/includesString';
+
 interface Props {
   title: string;
 }
@@ -66,6 +70,18 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
     'selfies',
     'marin-kitagawa',
   ];
+  const nsfwCategories = [
+    'ass',
+    'hentai',
+    'milf',
+    'oral',
+    'paizuri',
+    'ecchi',
+    'ero',
+    'waifu',
+    'oppai',
+    'uniform',
+  ];
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
   const [settingsOpened, { open: openSettings, close: closeSettings }] =
@@ -75,8 +91,7 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
   const [latestAnimeError, setlatestAnimeError] = useState<boolean>(false);
   const [showBackground, setshowBackground] = useState<boolean>(true);
   const [imageCategory, setimageCategory] = useState<string>(sfwCategories[0]);
-  const { colorScheme, setColorScheme, clearColorScheme } =
-    useMantineColorScheme();
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
   const theme = useMantineTheme();
   const computedColorScheme = useComputedColorScheme('light', {
     getInitialValueInEffect: true,
@@ -120,6 +135,16 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
     />
   );
 
+  const optionsFilter: OptionsFilter = ({ options, search }) => {
+    const filtered = (options as ComboboxItem[]).filter(
+      (option) =>
+        option.label.toLowerCase().trim().includes(search.toLowerCase().trim())
+      // includesString(option.label, search)
+    );
+
+    return filtered.slice(0, 10);
+  };
+
   return (
     <>
       <Toaster position="bottom-right" />
@@ -142,16 +167,25 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
             <Select
               mt={25}
               placeholder="Search Anime name"
-              data={['React', 'Angular', 'Vue', 'Svelte']}
+              data={gogoanimeData['Trending_animes'].map((el) => ({
+                label: el.name,
+                value: el.link,
+              }))}
               searchable
               miw={300}
               radius={'lg'}
               w={'70%'}
+              filter={optionsFilter}
               size="md"
               styles={{
                 input: {
                   border: '2px solid #228be6',
                 },
+              }}
+              onChange={(el) => {
+                if (el) {
+                  chrome.tabs.update({ url: el });
+                }
               }}
               rightSection={
                 <ActionIcon variant="transparent" size={'md'} mr={15}>

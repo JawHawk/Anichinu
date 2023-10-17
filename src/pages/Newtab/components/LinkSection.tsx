@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import {
   ActionIcon,
   Button,
-  Center,
   Grid,
   Image,
+  Menu,
   Modal,
-  Space,
   Stack,
   Text,
   TextInput,
@@ -14,85 +13,39 @@ import {
 import youtubeIcon from '../../../assets/img/youtube.png';
 import driveIcon from '../../../assets/img/drivestat.png';
 import mailIcon from '../../../assets/img/mailstat.png';
-import plusIcon from '../../../assets/img/add-new.png';
-import { BrandYoutube, Plus } from 'tabler-icons-react';
-import { useDisclosure } from '@mantine/hooks';
+import { DotsVertical, Plus } from 'tabler-icons-react';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { toast } from 'react-hot-toast';
+import saveLocalstorage from '../util/saveLocalstorage';
 
 interface Props {}
 
 interface linkData {
-  name: string | undefined;
-  link: string | undefined;
+  name: string;
+  link: string;
 }
 
 const LinkSection: React.FC<Props> = ({}: Props) => {
   const regex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
-  const linkData1 = localStorage.getItem('anichinu-link1');
-
-  let parsedLinkData1 = null;
-  if (linkData1) {
-    try {
-      parsedLinkData1 = JSON.parse(linkData1);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  const linkData2 = localStorage.getItem('anichinu-link2');
-
-  let parsedLinkData2 = null;
-  if (linkData2) {
-    try {
-      parsedLinkData2 = JSON.parse(linkData2);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  const linkData3 = localStorage.getItem('anichinu-link3');
-
-  let parsedLinkData3 = null;
-  if (linkData3) {
-    try {
-      parsedLinkData3 = JSON.parse(linkData3);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  const [firstLink, setfirstLink] = useState<linkData>({
-    name: parsedLinkData1 ? parsedLinkData1.name : null,
-    link: parsedLinkData1 ? parsedLinkData1.link : null,
-  });
-
-  const [secondLink, setsecondLink] = useState<linkData>({
-    name: parsedLinkData2 ? parsedLinkData2.name : null,
-    link: parsedLinkData2 ? parsedLinkData2.link : null,
-  });
-
-  const [thirdLink, setthirdLink] = useState<linkData>({
-    name: parsedLinkData3 ? parsedLinkData3.name : null,
-    link: parsedLinkData3 ? parsedLinkData3.link : null,
-  });
-
+  const storedLinkData = JSON.parse(
+    localStorage.getItem('anichinu-links') || '[]'
+  );
+  const [LinkData, setLinkData] = useState<linkData[]>(storedLinkData);
   const [opened, { open, close }] = useDisclosure(false);
-  const [active, setactive] = useState<number | null>(null);
   const [nameInput, setnameInput] = useState<string>('');
   const [linkInput, setlinkInput] = useState<string>('');
+  const [openedMenu, setOpenedMenu] = useState<boolean>(false);
+  const [hoveredLink, setHoveredLink] = useState<number | null>(null);
+  const [editActive, seteditActive] = useState<number | null>(null);
 
   useEffect(() => {
-    let linkData = localStorage.getItem(`anichinu-link${active}`);
+    console.log(editActive);
+  }, [editActive]);
 
-    if (active) {
-      if (linkData) {
-        let parsedData = JSON.parse(linkData);
-        setnameInput(parsedData['name']);
-        setlinkInput(parsedData['link']);
-      } else {
-        setnameInput('');
-        setlinkInput('');
-      }
-    }
-  }, [active]);
+  const defaultLinks = [
+    { name: 'Youtube', link: 'https://www.youtube.com/', icon: youtubeIcon },
+    { name: 'Gmail', link: 'https://mail.google.com/', icon: mailIcon },
+  ];
 
   function submitForm(event: any) {
     event.preventDefault();
@@ -101,20 +54,35 @@ const LinkSection: React.FC<Props> = ({}: Props) => {
       if (nameInput.replaceAll(' ', '') === '') {
         toast.error("Name can't be empty");
       } else {
-        localStorage.setItem(
-          `anichinu-link${active}`,
-          JSON.stringify({ name: nameInput, link: linkInput })
-        );
-        switch (active) {
-          case 1:
-            setfirstLink({ name: nameInput, link: linkInput });
-            break;
-          case 2:
-            setsecondLink({ name: nameInput, link: linkInput });
-            break;
-          case 3:
-            setthirdLink({ name: nameInput, link: linkInput });
+        if (editActive != null) {
+          setLinkData((pre) => {
+            let newData = [...pre];
+            newData[editActive] = {
+              name: nameInput,
+              link: linkInput,
+            };
+            saveLocalstorage(newData);
+            return newData;
+          });
+        } else {
+          setLinkData((pre) => [
+            ...pre,
+            {
+              name: nameInput,
+              link: linkInput,
+            },
+          ]);
+          saveLocalstorage([
+            ...LinkData,
+            {
+              name: nameInput,
+              link: linkInput,
+            },
+          ]);
         }
+        seteditActive(null);
+        setnameInput('');
+        setlinkInput('');
         close();
       }
     } else {
@@ -124,61 +92,100 @@ const LinkSection: React.FC<Props> = ({}: Props) => {
   }
 
   return (
-    <Stack w={'65%'} gap={40}>
-      <Grid w={'100%'}>
-        <Grid.Col span={4} p={5}>
-          <a href="https://www.youtube.com/" style={{ textDecoration: 'none' }}>
-            <Stack gap={5}>
-              <Image src={youtubeIcon} w={60} h={60} />
-              <Text fz={'sm'} fw={600} c={'#228be6'}>
-                Youtube
-              </Text>
-            </Stack>
-          </a>
-        </Grid.Col>
-        <Grid.Col span={4} p={5}>
-          <a
-            href="https://drive.google.com/"
-            style={{ textDecoration: 'none' }}
-          >
-            <Stack gap={5}>
-              <Image src={driveIcon} w={60} h={60} />
-              <Text fz={'sm'} fw={600} c={'#228be6'}>
-                Drive
-              </Text>
-            </Stack>
-          </a>
-        </Grid.Col>
-        <Grid.Col span={4} p={5}>
-          <a href="https://mail.google.com/" style={{ textDecoration: 'none' }}>
-            <Stack gap={5}>
-              <Image src={mailIcon} w={60} h={60} />
-              <Text fz={'sm'} fw={600} c={'#228be6'}>
-                Gmail
-              </Text>
-            </Stack>
-          </a>
-        </Grid.Col>
-      </Grid>
-      <Grid w={'100%'}>
-        <Grid.Col span={4} p={5}>
-          {firstLink.name ? (
-            <a href={firstLink.link} style={{ textDecoration: 'None' }}>
-              <Stack gap={5} align="center" justify="center" h={'100%'}>
-                <Image src={youtubeIcon} w={60} h={60} />
+    <Stack w={'68%'} gap={40}>
+      <Grid w={'100%'} gutter={40} justify="center">
+        {defaultLinks.map((el, index) => (
+          <Grid.Col span={4} key={index}>
+            <a href={el['link']} style={{ textDecoration: 'none' }}>
+              <Stack gap={5}>
+                <Image src={el['icon']} w={60} h={60} />
                 <Text fz={'sm'} fw={600} c={'#228be6'}>
-                  {firstLink['name']}
+                  {el['name']}
                 </Text>
               </Stack>
             </a>
-          ) : (
+          </Grid.Col>
+        ))}
+        {LinkData.map((el, index) => (
+          <Grid.Col
+            span={4}
+            key={index}
+            onMouseEnter={() => setHoveredLink(index)}
+            onMouseLeave={() => {
+              setHoveredLink(null);
+              setOpenedMenu(false);
+            }}
+            id="gridcol"
+            pos={'relative'}
+          >
+            <a href={el['link']} style={{ textDecoration: 'none' }}>
+              <Stack gap={5}>
+                <Image src={youtubeIcon} w={60} h={60} />
+                <Text
+                  fz={'sm'}
+                  fw={600}
+                  truncate="end"
+                  w={'100%'}
+                  ta={'center'}
+                  c={'#228be6'}
+                >
+                  {el['name']}
+                </Text>
+              </Stack>
+            </a>
+            {index == hoveredLink && (
+              <Menu
+                shadow="md"
+                position="left-start"
+                opened={openedMenu}
+                onChange={setOpenedMenu}
+              >
+                <Menu.Target>
+                  <ActionIcon
+                    pos={'absolute'}
+                    top={20}
+                    right={20}
+                    variant="subtle"
+                  >
+                    <DotsVertical />
+                  </ActionIcon>
+                </Menu.Target>
+
+                <Menu.Dropdown>
+                  <Menu.Item
+                    onClick={() => {
+                      seteditActive(index);
+                      setnameInput(LinkData[index]['name']);
+                      setlinkInput(LinkData[index]['link']);
+                      open();
+                    }}
+                  >
+                    Edit
+                  </Menu.Item>
+                  <Menu.Item
+                    onClick={() =>
+                      setLinkData((pre) => {
+                        let newData = pre.filter((el, i) => i != index);
+                        saveLocalstorage(newData);
+                        return newData;
+                      })
+                    }
+                  >
+                    Delete
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            )}
+          </Grid.Col>
+        ))}
+        {LinkData.length < 4 && (
+          <Grid.Col span={4}>
             <Stack
               gap={5}
               align="center"
               justify="center"
               h={'100%'}
               onClick={() => {
-                setactive(1);
                 open();
               }}
               className="addlink"
@@ -188,76 +195,19 @@ const LinkSection: React.FC<Props> = ({}: Props) => {
                 Add new
               </Text>
             </Stack>
-          )}
-        </Grid.Col>
-        <Grid.Col span={4} p={5}>
-          <Stack gap={5} align="center" justify="center" h={'100%'}>
-            {secondLink.name ? (
-              <a href={secondLink.link} style={{ textDecoration: 'None' }}>
-                <Stack gap={5} align="center" justify="center" h={'100%'}>
-                  <Image src={youtubeIcon} w={60} h={60} />
-                  <Text fz={'sm'} fw={600} c={'#228be6'}>
-                    {secondLink['name']}
-                  </Text>
-                </Stack>
-              </a>
-            ) : (
-              <Stack
-                gap={5}
-                align="center"
-                justify="center"
-                h={'100%'}
-                onClick={() => {
-                  setactive(2);
-                  open();
-                }}
-                className="addlink"
-              >
-                <Plus size={60} />
-                <Text fz={'sm'} fw={600} c={'#228be6'}>
-                  Add new
-                </Text>
-              </Stack>
-            )}
-          </Stack>
-        </Grid.Col>
-        <Grid.Col span={4} p={5}>
-          <Stack gap={5} align="center" justify="center" h={'100%'}>
-            {thirdLink.name ? (
-              <a href={thirdLink.link}>
-                <Stack gap={5} align="center" justify="center" h={'100%'}>
-                  <Image src={youtubeIcon} w={60} h={60} />
-                  <Text fz={'sm'} fw={600} c={'#228be6'}>
-                    {thirdLink['name']}
-                  </Text>
-                </Stack>
-              </a>
-            ) : (
-              <Stack
-                gap={5}
-                align="center"
-                justify="center"
-                h={'100%'}
-                onClick={() => {
-                  setactive(3);
-                  open();
-                }}
-                className="addlink"
-              >
-                <Plus size={60} />
-                <Text fz={'sm'} fw={600} c={'#228be6'}>
-                  Add new
-                </Text>
-              </Stack>
-            )}
-          </Stack>
-        </Grid.Col>
+          </Grid.Col>
+        )}
       </Grid>
+
       <Modal
         centered
         opened={opened}
         onClose={close}
-        title={`Add new Link ${active}`}
+        title={
+          editActive != null
+            ? `Edit Link ${editActive + 1}`
+            : `Add Link ${LinkData.length + 3}`
+        }
       >
         <form onSubmit={submitForm}>
           <TextInput
@@ -276,7 +226,7 @@ const LinkSection: React.FC<Props> = ({}: Props) => {
             }
             onChange={(event) => setlinkInput(event.currentTarget.value)}
           />
-          <Button mt={20} type="submit">
+          <Button mt={20} type="submit" variant="outline" mr={25}>
             Done
           </Button>
         </form>
