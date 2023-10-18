@@ -189,10 +189,16 @@ const SettingsDrawer: React.FC<Props> = ({
             />
           </Group>
         </Card>
-        <Card w={'max-content'} shadow="xs" p={15} radius={'md'} withBorder>
-          <Group wrap="nowrap">
+        <Card mt={75} w={'100%'} shadow="xs" p={15} radius={'md'} withBorder>
+          <Group wrap="nowrap" justify="center">
             <InfoCircle size={22} color="orange" />
             <Text c={'#FFA500'}>Nsfw feature will be coming soon</Text>
+          </Group>
+        </Card>
+        <Card w={'100%'} shadow="xs" p={15} radius={'md'} withBorder>
+          <Group w={'100%'} justify="center">
+            <Text>Created By:</Text>
+            <a href="https://github.com/JawHawk">Chinmay J</a>
           </Group>
         </Card>
       </Stack>
