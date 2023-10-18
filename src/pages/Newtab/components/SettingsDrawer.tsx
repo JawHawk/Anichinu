@@ -192,7 +192,7 @@ const SettingsDrawer: React.FC<Props> = ({
         <Card mt={75} w={'100%'} shadow="xs" p={15} radius={'md'} withBorder>
           <Group wrap="nowrap" justify="center">
             <InfoCircle size={22} color="orange" />
-            <Text c={'#FFA500'}>Nsfw feature will be coming soon</Text>
+            <Text c={'#FFA500'}>Nsfw feature will come soon</Text>
           </Group>
         </Card>
         <Card w={'100%'} shadow="xs" p={15} radius={'md'} withBorder>

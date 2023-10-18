@@ -17,10 +17,38 @@ import { DotsVertical, Plus } from 'tabler-icons-react';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { toast } from 'react-hot-toast';
 import saveLocalstorage from '../util/saveLocalstorage';
+import {
+  LetterA,
+  LetterB,
+  LetterC,
+  LetterD,
+  LetterE,
+  LetterF,
+  LetterG,
+  LetterH,
+  LetterI,
+  LetterJ,
+  LetterK,
+  LetterL,
+  LetterM,
+  LetterN,
+  LetterO,
+  LetterP,
+  LetterQ,
+  LetterR,
+  LetterS,
+  LetterT,
+  LetterU,
+  LetterV,
+  LetterW,
+  LetterX,
+  LetterY,
+  LetterZ,
+} from 'tabler-icons-react';
 
 interface Props {}
 
-interface linkData {
+interface linkDataType {
   name: string;
   link: string;
 }
@@ -30,7 +58,7 @@ const LinkSection: React.FC<Props> = ({}: Props) => {
   const storedLinkData = JSON.parse(
     localStorage.getItem('anichinu-links') || '[]'
   );
-  const [LinkData, setLinkData] = useState<linkData[]>(storedLinkData);
+  const [LinkData, setLinkData] = useState<linkDataType[]>(storedLinkData);
   const [opened, { open, close }] = useDisclosure(false);
   const [nameInput, setnameInput] = useState<string>('');
   const [linkInput, setlinkInput] = useState<string>('');
@@ -43,12 +71,45 @@ const LinkSection: React.FC<Props> = ({}: Props) => {
     { name: 'Gmail', link: 'https://mail.google.com/', icon: mailIcon },
   ];
 
+  const AlphabetIcons = {
+    a: LetterA,
+    b: LetterB,
+    c: LetterC,
+    d: LetterD,
+    e: LetterE,
+    f: LetterF,
+    g: LetterG,
+    h: LetterH,
+    i: LetterI,
+    j: LetterJ,
+    k: LetterK,
+    l: LetterL,
+    m: LetterM,
+    n: LetterN,
+    o: LetterO,
+    p: LetterP,
+    q: LetterQ,
+    r: LetterR,
+    s: LetterS,
+    t: LetterT,
+    u: LetterU,
+    v: LetterV,
+    w: LetterW,
+    x: LetterX,
+    y: LetterY,
+    z: LetterZ,
+  };
+
   function submitForm(event: any) {
     event.preventDefault();
 
     if (regex.test(linkInput)) {
-      if (nameInput.replaceAll(' ', '') === '') {
-        toast.error("Name can't be empty");
+      if (
+        nameInput.replaceAll(' ', '') === '' ||
+        !/^[a-zA-Z]/.test(nameInput.at(0) || '') ||
+        nameInput.length > 16
+      ) {
+        toast.error('Name should start with an Alphabet and max length 15');
       } else {
         if (editActive != null) {
           setLinkData((pre) => {
@@ -102,78 +163,84 @@ const LinkSection: React.FC<Props> = ({}: Props) => {
             </a>
           </Grid.Col>
         ))}
-        {LinkData.map((el, index) => (
-          <Grid.Col
-            span={4}
-            key={index}
-            onMouseEnter={() => setHoveredLink(index)}
-            onMouseLeave={() => {
-              setHoveredLink(null);
-              setOpenedMenu(false);
-            }}
-            id="gridcol"
-            pos={'relative'}
-          >
-            <a href={el['link']} style={{ textDecoration: 'none' }}>
-              <Stack gap={5}>
-                <Image src={youtubeIcon} w={60} h={60} />
-                <Text
-                  fz={'sm'}
-                  fw={600}
-                  truncate="end"
-                  w={'100%'}
-                  ta={'center'}
-                  c={'#228be6'}
+        {LinkData.map((el: linkDataType, index) => {
+          const Ic =
+            AlphabetIcons[
+              el['name'][0].toLowerCase() as keyof typeof AlphabetIcons
+            ];
+          return (
+            <Grid.Col
+              span={4}
+              key={index}
+              onMouseEnter={() => setHoveredLink(index)}
+              onMouseLeave={() => {
+                setHoveredLink(null);
+                setOpenedMenu(false);
+              }}
+              id="gridcol"
+              pos={'relative'}
+            >
+              <a href={el['link']} style={{ textDecoration: 'none' }}>
+                <Stack gap={5}>
+                  <Ic width={60} height={60} />
+                  <Text
+                    fz={'sm'}
+                    fw={600}
+                    truncate="end"
+                    w={'100%'}
+                    ta={'center'}
+                    c={'#228be6'}
+                  >
+                    {el['name']}
+                  </Text>
+                </Stack>
+              </a>
+              {index == hoveredLink && (
+                <Menu
+                  shadow="md"
+                  position="left-start"
+                  opened={openedMenu}
+                  onChange={setOpenedMenu}
                 >
-                  {el['name']}
-                </Text>
-              </Stack>
-            </a>
-            {index == hoveredLink && (
-              <Menu
-                shadow="md"
-                position="left-start"
-                opened={openedMenu}
-                onChange={setOpenedMenu}
-              >
-                <Menu.Target>
-                  <ActionIcon
-                    pos={'absolute'}
-                    top={20}
-                    right={20}
-                    variant="subtle"
-                  >
-                    <DotsVertical />
-                  </ActionIcon>
-                </Menu.Target>
+                  <Menu.Target>
+                    <ActionIcon
+                      pos={'absolute'}
+                      top={20}
+                      right={20}
+                      variant="subtle"
+                    >
+                      <DotsVertical />
+                    </ActionIcon>
+                  </Menu.Target>
 
-                <Menu.Dropdown>
-                  <Menu.Item
-                    onClick={() => {
-                      seteditActive(index);
-                      setnameInput(LinkData[index]['name']);
-                      setlinkInput(LinkData[index]['link']);
-                      open();
-                    }}
-                  >
-                    Edit
-                  </Menu.Item>
-                  <Menu.Item
-                    onClick={() =>
-                      setLinkData((pre) => {
-                        let newData = pre.filter((el, i) => i != index);
-                        saveLocalstorage('anichinu-links', newData);
-                        return newData;
-                      })
-                    }
-                  >
-                    Delete
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
-            )}
-          </Grid.Col>
-        ))}
+                  <Menu.Dropdown>
+                    <Menu.Item
+                      onClick={() => {
+                        seteditActive(index);
+                        setnameInput(LinkData[index]['name']);
+                        setlinkInput(LinkData[index]['link']);
+                        open();
+                      }}
+                    >
+                      Edit
+                    </Menu.Item>
+                    <Menu.Item
+                      onClick={() =>
+                        setLinkData((pre) => {
+                          let newData = pre.filter((el, i) => i != index);
+                          saveLocalstorage('anichinu-links', newData);
+                          return newData;
+                        })
+                      }
+                    >
+                      Delete
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              )}
+            </Grid.Col>
+          );
+        })}
         {LinkData.length < 4 && (
           <Grid.Col span={4}>
             <Stack
