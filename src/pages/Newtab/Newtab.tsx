@@ -43,15 +43,10 @@ import { Toaster, toast } from 'react-hot-toast';
 import fetchImage from './util/fetchImage';
 import gogoanimeData from './assets/gogoanimeData.json';
 import aniwatchData from './assets/aniwatchData.json';
-
-import saveLocalstorage from './util/saveLocalstorage';
+import SettingsDrawer from './components/SettingsDrawer';
 
 interface Props {
   title: string;
-}
-
-interface ImageData {
-  url: string;
 }
 
 interface Anime {
@@ -63,6 +58,7 @@ interface Anime {
   animeImg: string;
   episodeUrl: string;
 }
+type AnimeRedirectType = 'gogoanime' | 'aniwatch';
 
 const Newtab: React.FC<Props> = ({ title }: Props) => {
   const sfwCategories = [
@@ -98,15 +94,15 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
   const [imageCategory, setimageCategory] = useState<string>(
     localStorage.getItem('animechinu-imgCategory') || sfwCategories[0]
   );
-  const { colorScheme, setColorScheme } = useMantineColorScheme();
   const theme = useMantineTheme();
-  const computedColorScheme = useComputedColorScheme('light', {
-    getInitialValueInEffect: true,
-  });
 
-  const [animeRedirect, setanimeRedirect] = useState<'gogoanime' | 'aniwatch'>(
-    (localStorage.getItem('anichinu-redirect') as 'gogoanime' | 'aniwatch') ||
-      'gogoanime'
+  const [showAnichinu, setshowAnichinu] = useState<boolean>(
+    JSON.parse(localStorage.getItem('anichinu-section') || 'true')
+  );
+
+  const [animeRedirect, setanimeRedirect] = useState<AnimeRedirectType>(
+    (localStorage.getItem('anichinu-redirect') as AnimeRedirectType) ||
+      'aniwatch'
   );
 
   async function changeBg() {
@@ -162,7 +158,12 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
       <Toaster position="bottom-right" />
       <Flex h={'100vh'} w={'100vw'} justify={'center'}>
         {showBackground && (
-          <Flex w={'62%'} miw={200} justify={'center'} align={'center'}>
+          <Flex
+            w={showAnichinu ? '62%' : '100%'}
+            miw={200}
+            justify={'center'}
+            align={'center'}
+          >
             {imageUrl ? (
               <Image key={imageUrl} fit="contain" src={imageUrl} h={'100%'} />
             ) : (
@@ -170,50 +171,52 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
             )}
           </Flex>
         )}
-        <Stack w={showBackground ? '38%' : '40%'} align="center" miw={350}>
-          <Stack h={'50%'} w={'100%'} justify="flex-end">
-            <Image h={115} fit="contain" src={anichinuLogo} mb={20} />
-            <LinkSection />
-          </Stack>
-          <Stack h={'50%'} w={'100%'}>
-            <Select
-              mt={25}
-              placeholder="Search Anime name"
-              data={
-                animeRedirect === 'gogoanime'
-                  ? gogoanimeData['Trending_animes'].map((el) => ({
-                      label: el.name,
-                      value: el.link,
-                    }))
-                  : aniwatchData['Trending_animes'].map((el) => ({
-                      label: el.name,
-                      value: el.link,
-                    }))
-              }
-              searchable
-              miw={300}
-              radius={'lg'}
-              w={'70%'}
-              filter={optionsFilter}
-              size="md"
-              styles={{
-                input: {
-                  border: '2px solid #228be6',
-                },
-              }}
-              onChange={(el) => {
-                if (el) {
-                  chrome.tabs.update({ url: el });
+        {showAnichinu && (
+          <Stack w={showBackground ? '38%' : '40%'} align="center" miw={350}>
+            <Stack h={'50%'} w={'100%'} justify="flex-end">
+              <Image h={115} fit="contain" src={anichinuLogo} mb={20} />
+              <LinkSection />
+            </Stack>
+            <Stack h={'50%'} w={'100%'}>
+              <Select
+                mt={25}
+                placeholder="Search Anime name"
+                data={
+                  animeRedirect === 'gogoanime'
+                    ? gogoanimeData['Trending_animes'].map((el) => ({
+                        label: el.name,
+                        value: el.link,
+                      }))
+                    : aniwatchData['Trending_animes'].map((el) => ({
+                        label: el.name,
+                        value: el.link,
+                      }))
                 }
-              }}
-              rightSection={
-                <ActionIcon variant="transparent" size={'md'} mr={15}>
-                  <Search color="#228be6" />
-                </ActionIcon>
-              }
-            />
+                searchable
+                miw={300}
+                radius={'lg'}
+                w={'70%'}
+                filter={optionsFilter}
+                size="md"
+                styles={{
+                  input: {
+                    border: '2px solid #228be6',
+                  },
+                }}
+                onChange={(el) => {
+                  if (el) {
+                    chrome.tabs.update({ url: el });
+                  }
+                }}
+                rightSection={
+                  <ActionIcon variant="transparent" size={'md'} mr={15}>
+                    <Search color="#228be6" />
+                  </ActionIcon>
+                }
+              />
+            </Stack>
           </Stack>
-        </Stack>
+        )}
       </Flex>
       <Stack
         w={60}
@@ -282,107 +285,18 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
           </Center>
         )}
       </Drawer>
-      <Drawer
-        position="right"
-        opened={settingsOpened}
-        onClose={closeSettings}
-        size={525}
-      >
-        <Group justify="center" mb={35}>
-          <Settings size={26} color="#228be6" />
-          <Title order={2} c={'blue'}>
-            Settings
-          </Title>
-        </Group>
-        <Stack justify="space-between" h={'100%'}>
-          <Card shadow="xs" p={15} radius={'md'} withBorder>
-            <Group w={'100%'} justify="space-between">
-              <Text>Show Background Image</Text>
-              <Switch
-                size="lg"
-                onLabel="ON"
-                offLabel="OFF"
-                checked={showBackground}
-                onChange={(event) => {
-                  setshowBackground(event.currentTarget.checked);
-                  saveLocalstorage('anichinu-bg', event.currentTarget.checked);
-                }}
-                radius={'md'}
-              />
-            </Group>
-          </Card>
-          <Card shadow="xs" p={15} radius={'md'} withBorder>
-            <Group w={'100%'} justify="space-between">
-              <Text>Image Category</Text>
-              <Select
-                value={imageCategory}
-                onChange={(val) => {
-                  if (val) {
-                    setimageCategory(val);
-                    saveLocalstorage('animechinu-imgCategory', val);
-                  }
-                }}
-                variant="filled"
-                data={sfwCategories}
-                maxDropdownHeight={150}
-                withScrollArea={false}
-                styles={{ dropdown: { maxHeight: 160, overflowY: 'auto' } }}
-              />
-            </Group>
-          </Card>
-          <Card shadow="xs" p={15} radius={'md'} withBorder>
-            <Group w={'100%'} justify="space-between">
-              <Text>Color Theme</Text>
-
-              <Tooltip
-                label={
-                  colorScheme === 'light'
-                    ? 'Turn on Dark mode'
-                    : 'Turn on Light mode'
-                }
-                position="left"
-                offset={10}
-                withArrow
-                arrowSize={5}
-              >
-                <ActionIcon
-                  onClick={() =>
-                    setColorScheme(
-                      computedColorScheme === 'light' ? 'dark' : 'light'
-                    )
-                  }
-                  variant="default"
-                  size="xl"
-                  aria-label="Toggle color scheme"
-                >
-                  {colorScheme == 'light' ? (
-                    <Sun color="#FF5349" />
-                  ) : (
-                    <Moon color="#228be6" />
-                  )}
-                </ActionIcon>
-              </Tooltip>
-            </Group>
-          </Card>
-          <Card shadow="xs" p={15} radius={'md'} withBorder>
-            <Group w={'100%'} justify="space-between">
-              <Text>Anime Redirect Site</Text>
-              <SegmentedControl
-                value={animeRedirect}
-                onChange={(val) => {
-                  setanimeRedirect(val);
-                  saveLocalstorage('anichinu-redirect', val);
-                }}
-                color="blue"
-                data={[
-                  { label: 'Gogoanime', value: 'gogoanime' },
-                  { label: 'Aniwatch', value: 'aniwatch' },
-                ]}
-              />
-            </Group>
-          </Card>
-        </Stack>
-      </Drawer>
+      <SettingsDrawer
+        settingsOpened={settingsOpened}
+        closeSettings={closeSettings}
+        showBackground={showBackground}
+        setshowBackground={setshowBackground}
+        showAnichinu={showAnichinu}
+        setshowAnichinu={setshowAnichinu}
+        imageCategory={imageCategory}
+        setimageCategory={setimageCategory}
+        animeRedirect={animeRedirect}
+        setanimeRedirect={setanimeRedirect}
+      />
     </>
   );
 };
