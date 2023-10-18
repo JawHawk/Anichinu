@@ -25,6 +25,7 @@ import {
   useComputedColorScheme,
   OptionsFilter,
   ComboboxItem,
+  SegmentedControl,
 } from '@mantine/core';
 import LinkSection from './components/LinkSection';
 import anichinuLogo from '../../assets/img/anichinu.png';
@@ -41,7 +42,9 @@ import {
 import { Toaster, toast } from 'react-hot-toast';
 import fetchImage from './util/fetchImage';
 import gogoanimeData from './assets/gogoanimeData.json';
-import includesString from './util/includesString';
+import aniwatchData from './assets/aniwatchData.json';
+
+import saveLocalstorage from './util/saveLocalstorage';
 
 interface Props {
   title: string;
@@ -89,13 +92,22 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
 
   const [latestAnimeData, setlatestAnimeData] = useState<Anime[] | null>(null);
   const [latestAnimeError, setlatestAnimeError] = useState<boolean>(false);
-  const [showBackground, setshowBackground] = useState<boolean>(true);
-  const [imageCategory, setimageCategory] = useState<string>(sfwCategories[0]);
+  const [showBackground, setshowBackground] = useState<boolean>(
+    JSON.parse(localStorage.getItem('anichinu-bg') || 'true')
+  );
+  const [imageCategory, setimageCategory] = useState<string>(
+    localStorage.getItem('animechinu-imgCategory') || sfwCategories[0]
+  );
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const theme = useMantineTheme();
   const computedColorScheme = useComputedColorScheme('light', {
     getInitialValueInEffect: true,
   });
+
+  const [animeRedirect, setanimeRedirect] = useState<'gogoanime' | 'aniwatch'>(
+    (localStorage.getItem('anichinu-redirect') as 'gogoanime' | 'aniwatch') ||
+      'gogoanime'
+  );
 
   async function changeBg() {
     let imgURL = await fetchImage(imageCategory);
@@ -167,10 +179,17 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
             <Select
               mt={25}
               placeholder="Search Anime name"
-              data={gogoanimeData['Trending_animes'].map((el) => ({
-                label: el.name,
-                value: el.link,
-              }))}
+              data={
+                animeRedirect === 'gogoanime'
+                  ? gogoanimeData['Trending_animes'].map((el) => ({
+                      label: el.name,
+                      value: el.link,
+                    }))
+                  : aniwatchData['Trending_animes'].map((el) => ({
+                      label: el.name,
+                      value: el.link,
+                    }))
+              }
               searchable
               miw={300}
               radius={'lg'}
@@ -284,9 +303,10 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
                 onLabel="ON"
                 offLabel="OFF"
                 checked={showBackground}
-                onChange={(event) =>
-                  setshowBackground(event.currentTarget.checked)
-                }
+                onChange={(event) => {
+                  setshowBackground(event.currentTarget.checked);
+                  saveLocalstorage('anichinu-bg', event.currentTarget.checked);
+                }}
                 radius={'md'}
               />
             </Group>
@@ -299,6 +319,7 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
                 onChange={(val) => {
                   if (val) {
                     setimageCategory(val);
+                    saveLocalstorage('animechinu-imgCategory', val);
                   }
                 }}
                 variant="filled"
@@ -341,6 +362,23 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
                   )}
                 </ActionIcon>
               </Tooltip>
+            </Group>
+          </Card>
+          <Card shadow="xs" p={15} radius={'md'} withBorder>
+            <Group w={'100%'} justify="space-between">
+              <Text>Anime Redirect Site</Text>
+              <SegmentedControl
+                value={animeRedirect}
+                onChange={(val) => {
+                  setanimeRedirect(val);
+                  saveLocalstorage('anichinu-redirect', val);
+                }}
+                color="blue"
+                data={[
+                  { label: 'Gogoanime', value: 'gogoanime' },
+                  { label: 'Aniwatch', value: 'aniwatch' },
+                ]}
+              />
             </Group>
           </Card>
         </Stack>

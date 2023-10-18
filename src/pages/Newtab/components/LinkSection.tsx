@@ -38,10 +38,6 @@ const LinkSection: React.FC<Props> = ({}: Props) => {
   const [hoveredLink, setHoveredLink] = useState<number | null>(null);
   const [editActive, seteditActive] = useState<number | null>(null);
 
-  useEffect(() => {
-    console.log(editActive);
-  }, [editActive]);
-
   const defaultLinks = [
     { name: 'Youtube', link: 'https://www.youtube.com/', icon: youtubeIcon },
     { name: 'Gmail', link: 'https://mail.google.com/', icon: mailIcon },
@@ -61,7 +57,7 @@ const LinkSection: React.FC<Props> = ({}: Props) => {
               name: nameInput,
               link: linkInput,
             };
-            saveLocalstorage(newData);
+            saveLocalstorage('anichinu-links', newData);
             return newData;
           });
         } else {
@@ -72,7 +68,7 @@ const LinkSection: React.FC<Props> = ({}: Props) => {
               link: linkInput,
             },
           ]);
-          saveLocalstorage([
+          saveLocalstorage('anichinu-links', [
             ...LinkData,
             {
               name: nameInput,
@@ -166,7 +162,7 @@ const LinkSection: React.FC<Props> = ({}: Props) => {
                     onClick={() =>
                       setLinkData((pre) => {
                         let newData = pre.filter((el, i) => i != index);
-                        saveLocalstorage(newData);
+                        saveLocalstorage('anichinu-links', newData);
                         return newData;
                       })
                     }

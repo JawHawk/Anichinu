@@ -1,5 +1,5 @@
-function saveLocalstorage(data: object) {
-    localStorage.setItem('anichinu-links', JSON.stringify(data))
+function saveLocalstorage(key: string , data: object | string | boolean) {
+    localStorage.setItem(key, typeof data === 'string' ? data : JSON.stringify(data))
 }
  
 export default saveLocalstorage
