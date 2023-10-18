@@ -1,0 +1,7 @@
+html {
+background-color: white !important;
+}
+
+.addlink :hover{
+  cursor: pointer;
+}
