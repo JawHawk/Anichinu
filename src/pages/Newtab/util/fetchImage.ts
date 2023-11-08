@@ -1,10 +1,11 @@
 interface ImageData {
     url: string;
   }
+type bgType = 'sfw' | 'nsfw';
 
-async function fetchImage(category: string): Promise<string | null> {
+async function fetchImage(category: string, bgType: bgType): Promise<string | null> {
     const apiUrl =
-      `https://api.waifu.im/search/?included_tags=${category}&is_nsfw=false`;
+      `https://api.waifu.im/search/?included_tags=${category}&is_nsfw=${bgType == "nsfw" ? "true" : "false"}`;
 
     try {
       const fetchData = await fetch(apiUrl)

@@ -16,16 +16,10 @@ import {
   Tooltip,
   Group,
   Paper,
-  Switch,
-  Title,
-  Card,
-  useMantineColorScheme,
   useMantineTheme,
   rem,
-  useComputedColorScheme,
   OptionsFilter,
   ComboboxItem,
-  SegmentedControl,
 } from '@mantine/core';
 import LinkSection from './components/LinkSection';
 import anichinuLogo from '../../assets/img/anichinu.png';
@@ -44,6 +38,7 @@ import fetchImage from './util/fetchImage';
 import gogoanimeData from './assets/gogoanimeData.json';
 import aniwatchData from './assets/aniwatchData.json';
 import SettingsDrawer from './components/SettingsDrawer';
+import saveLocalstorage from './util/saveLocalstorage';
 
 interface Props {
   title: string;
@@ -59,6 +54,7 @@ interface Anime {
   episodeUrl: string;
 }
 type AnimeRedirectType = 'gogoanime' | 'aniwatch';
+type bgType = 'sfw' | 'nsfw';
 
 const Newtab: React.FC<Props> = ({ title }: Props) => {
   const sfwCategories = [
@@ -69,18 +65,7 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
     'selfies',
     'marin-kitagawa',
   ];
-  const nsfwCategories = [
-    'ass',
-    'hentai',
-    'milf',
-    'oral',
-    'paizuri',
-    'ecchi',
-    'ero',
-    'waifu',
-    'oppai',
-    'uniform',
-  ];
+
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
   const [settingsOpened, { open: openSettings, close: closeSettings }] =
@@ -105,8 +90,12 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
       'aniwatch'
   );
 
+  const [bgType, setbgType] = useState<bgType>(
+    (localStorage.getItem('anichinu-bgType') as bgType) || 'sfw'
+  );
+
   async function changeBg() {
-    let imgURL = await fetchImage(imageCategory);
+    let imgURL = await fetchImage(imageCategory, bgType);
     if (imgURL) {
       setImageUrl(imgURL);
     } else {
@@ -116,7 +105,9 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
 
   useEffect(() => {
     changeBg();
-  }, [imageCategory]);
+    saveLocalstorage('anichinu-bgType', bgType);
+    saveLocalstorage('anichinu-imgCategory', imageCategory);
+  }, [imageCategory, bgType]);
 
   useEffect(() => {
     fetch('https://webdis-vta0.onrender.com/recent-release')
@@ -296,6 +287,8 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
         setimageCategory={setimageCategory}
         animeRedirect={animeRedirect}
         setanimeRedirect={setanimeRedirect}
+        bgType={bgType}
+        setbgType={setbgType}
       />
     </>
   );
