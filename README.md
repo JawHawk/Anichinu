@@ -2,7 +2,7 @@
 
 # Anichinu v2.0
 
-### Made wathching Animes & Waifus easier
+### Made watching Animes & Waifus easier. Built using React.js & Webpack.
 
 ## Getting started
 1. Check if your [Node.js](https://nodejs.org/) version is >= **18**.
