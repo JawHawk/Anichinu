@@ -31,13 +31,10 @@ type Props = {
   setshowAnichinu: React.Dispatch<React.SetStateAction<boolean>>;
   imageCategory: string;
   setimageCategory: React.Dispatch<React.SetStateAction<string>>;
-  animeRedirect: AnimeRedirectType;
-  setanimeRedirect: React.Dispatch<React.SetStateAction<AnimeRedirectType>>;
   bgType: bgType;
   setbgType: React.Dispatch<React.SetStateAction<bgType>>;
 };
 
-type AnimeRedirectType = 'gogoanime' | 'aniwatch';
 type bgType = 'sfw' | 'nsfw';
 
 const SettingsDrawer: React.FC<Props> = ({
@@ -49,8 +46,6 @@ const SettingsDrawer: React.FC<Props> = ({
   setshowAnichinu,
   imageCategory,
   setimageCategory,
-  animeRedirect,
-  setanimeRedirect,
   bgType,
   setbgType,
 }: Props) => {
@@ -104,6 +99,9 @@ const SettingsDrawer: React.FC<Props> = ({
             onSubmit={(event) => {
               event.preventDefault();
               if (nsfwPassword === '36116158234121') {
+                if (!nsfwCategories.includes(imageCategory)) {
+                  setimageCategory(nsfwCategories[0]);
+                }
                 setbgType('nsfw');
                 close();
                 setnsfwPassword('');
@@ -178,6 +176,7 @@ const SettingsDrawer: React.FC<Props> = ({
                     setimageCategory(val);
                   }
                 }}
+                allowDeselect={false}
                 variant="filled"
                 data={bgType == 'sfw' ? sfwCategories : nsfwCategories}
                 maxDropdownHeight={150}
@@ -224,16 +223,10 @@ const SettingsDrawer: React.FC<Props> = ({
             <Group w={'100%'} justify="space-between">
               <Text>Anime Redirect Site</Text>
               <SegmentedControl
-                value={animeRedirect}
-                onChange={(val: AnimeRedirectType) => {
-                  setanimeRedirect(val);
-                  saveLocalstorage('anichinu-redirect', val);
-                }}
+                value="aniwaves"
                 color="blue"
-                data={[
-                  { label: 'Gogoanime', value: 'gogoanime' },
-                  { label: 'Aniwatch', value: 'aniwatch' },
-                ]}
+                disabled
+                data={[{ label: 'Aniwaves', value: 'aniwaves' }]}
               />
             </Group>
           </Card>
@@ -246,6 +239,9 @@ const SettingsDrawer: React.FC<Props> = ({
                   if (val == 'nsfw') {
                     open();
                   } else {
+                    if (!sfwCategories.includes(imageCategory)) {
+                      setimageCategory(sfwCategories[0]);
+                    }
                     setbgType(val);
                   }
                 }}

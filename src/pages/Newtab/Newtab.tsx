@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import Fuse from 'fuse.js';
 import './Newtab.css';
 import './Newtab.scss';
 import {
@@ -8,6 +9,7 @@ import {
   Flex,
   Image,
   Loader,
+  Modal,
   ScrollArea,
   Select,
   Stack,
@@ -35,8 +37,7 @@ import {
 } from 'tabler-icons-react';
 import { Toaster, toast } from 'react-hot-toast';
 import fetchImage from './util/fetchImage';
-import gogoanimeData from './assets/gogoanimeData.json';
-import aniwatchData from './assets/aniwatchData.json';
+import aniwavesData from './assets/aniwavesData.json';
 import SettingsDrawer from './components/SettingsDrawer';
 import saveLocalstorage from './util/saveLocalstorage';
 
@@ -53,10 +54,15 @@ interface Anime {
   animeImg: string;
   episodeUrl: string;
 }
-type AnimeRedirectType = 'gogoanime' | 'aniwatch';
 type bgType = 'sfw' | 'nsfw';
 
+const RELEASE_NOTES: Record<string, string> = {
+  '2.1':
+    "We're back! Switched anime source to Aniwaves (Gogoanime and Aniwatch were retired), updated the Waifu image API, added fuzzy search to the anime picker, and fixed a few category-switching bugs.",
+};
+
 const Newtab: React.FC<Props> = ({ title }: Props) => {
+  const version = chrome.runtime.getManifest().version;
   const sfwCategories = [
     'waifu',
     'oppai',
@@ -70,6 +76,8 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [settingsOpened, { open: openSettings, close: closeSettings }] =
     useDisclosure(false);
+  const [whatsNewOpened, { open: openWhatsNew, close: closeWhatsNew }] =
+    useDisclosure(false);
 
   const [latestAnimeData, setlatestAnimeData] = useState<Anime[] | null>(null);
   const [latestAnimeError, setlatestAnimeError] = useState<boolean>(false);
@@ -77,17 +85,12 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
     JSON.parse(localStorage.getItem('anichinu-bg') || 'true')
   );
   const [imageCategory, setimageCategory] = useState<string>(
-    localStorage.getItem('animechinu-imgCategory') || sfwCategories[0]
+    localStorage.getItem('anichinu-imgCategory') || sfwCategories[0]
   );
   const theme = useMantineTheme();
 
   const [showAnichinu, setshowAnichinu] = useState<boolean>(
     JSON.parse(localStorage.getItem('anichinu-section') || 'true')
-  );
-
-  const [animeRedirect, setanimeRedirect] = useState<AnimeRedirectType>(
-    (localStorage.getItem('anichinu-redirect') as AnimeRedirectType) ||
-      'aniwatch'
   );
 
   const [bgType, setbgType] = useState<bgType>(
@@ -120,6 +123,20 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
       });
   }, []);
 
+  useEffect(() => {
+    if (
+      RELEASE_NOTES[version] &&
+      localStorage.getItem('anichinu-seen-version') !== version
+    ) {
+      openWhatsNew();
+    }
+  }, []);
+
+  const dismissWhatsNew = () => {
+    localStorage.setItem('anichinu-seen-version', version);
+    closeWhatsNew();
+  };
+
   const sunIcon = (
     <Sun
       style={{ width: rem(16), height: rem(16) }}
@@ -134,19 +151,45 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
     />
   );
 
-  const optionsFilter: OptionsFilter = ({ options, search }) => {
-    const filtered = (options as ComboboxItem[]).filter(
-      (option) =>
-        option.label.toLowerCase().trim().includes(search.toLowerCase().trim())
-      // includesString(option.label, search)
-    );
+  const animeOptions = useMemo(
+    () =>
+      aniwavesData['Trending_animes'].map((el) => ({
+        label: el.name,
+        value: el.link,
+      })),
+    []
+  );
 
-    return filtered.slice(0, 10);
+  const fuse = useMemo(
+    () =>
+      new Fuse(animeOptions, {
+        keys: ['label'],
+        threshold: 0.4,
+        ignoreLocation: true,
+        minMatchCharLength: 2,
+      }),
+    [animeOptions]
+  );
+
+  const optionsFilter: OptionsFilter = ({ options, search }) => {
+    const query = search.trim();
+    if (!query) return (options as ComboboxItem[]).slice(0, 10);
+    return fuse.search(query, { limit: 10 }).map((r) => r.item);
   };
 
   return (
     <>
       <Toaster position="bottom-right" />
+      <Text
+        pos="fixed"
+        top={6}
+        right={10}
+        size="xs"
+        c="dimmed"
+        style={{ zIndex: 1, pointerEvents: 'none' }}
+      >
+        v{version}
+      </Text>
       <Flex h={'100vh'} w={'100vw'} justify={'center'}>
         {showBackground && (
           <Flex
@@ -172,17 +215,7 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
               <Select
                 mt={25}
                 placeholder="Search Anime name"
-                data={
-                  animeRedirect === 'gogoanime'
-                    ? gogoanimeData['Trending_animes'].map((el) => ({
-                        label: el.name,
-                        value: el.link,
-                      }))
-                    : aniwatchData['Trending_animes'].map((el) => ({
-                        label: el.name,
-                        value: el.link,
-                      }))
-                }
+                data={animeOptions}
                 searchable
                 miw={300}
                 radius={'lg'}
@@ -285,11 +318,22 @@ const Newtab: React.FC<Props> = ({ title }: Props) => {
         setshowAnichinu={setshowAnichinu}
         imageCategory={imageCategory}
         setimageCategory={setimageCategory}
-        animeRedirect={animeRedirect}
-        setanimeRedirect={setanimeRedirect}
         bgType={bgType}
         setbgType={setbgType}
       />
+      <Modal
+        centered
+        opened={whatsNewOpened}
+        onClose={dismissWhatsNew}
+        title={`What's new in v${version}`}
+      >
+        <Stack>
+          <Text size="sm">{RELEASE_NOTES[version]}</Text>
+          <Group justify="flex-end">
+            <Button onClick={dismissWhatsNew}>Got it</Button>
+          </Group>
+        </Stack>
+      </Modal>
     </>
   );
 };
