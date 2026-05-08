@@ -135,6 +135,11 @@ var options = {
             );
           },
         },
+        {
+          from: 'src/assets/img/girl2.png',
+          to: path.join(__dirname, 'build'),
+          force: true,
+        },
       ],
     }),
     new HtmlWebpackPlugin({
